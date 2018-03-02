@@ -15,7 +15,7 @@ import de.idealo.demo.reactivedemo.data.ItemParser;
 @RequiredArgsConstructor
 public class ImportChain {
 
-    private static final int PUBLISHING_BATCH_SIZE = 3;
+    private static final int PUBLISHING_BATCH_SIZE = 30;
 
     private final ItemParser itemParser;
     private final MappingChain mappingChain;

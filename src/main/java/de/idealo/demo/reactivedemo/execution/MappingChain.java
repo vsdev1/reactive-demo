@@ -29,6 +29,7 @@ public class MappingChain {
     private static final int THREAD_COUNT = 40;
 
     private ExecutorService mappingExecutor;
+    private final MetaDataService metaDataService;
 
     public Flowable<MappingResult> mapAndFilter(Items items) {
         return Flowable.just(items)
@@ -57,6 +58,9 @@ public class MappingChain {
     }
 
     private Flowable<MappingResult> mapAndFilterInternal(Items items) {
+        // TODO: might be removed later, is just to try async http client
+        metaDataService.getMetaData(items.getProductTitle())
+                .subscribe(s -> log.info("got meta data: {}", s));
         return Flowable.just(new MappingResult());
     }
 }
