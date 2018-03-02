@@ -16,7 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import de.idealo.demo.reactivedemo.data.Item;
+import de.idealo.demo.reactivedemo.data.Items;
 
 @Component
 @Slf4j
@@ -30,10 +30,10 @@ public class MappingChain {
 
     private ExecutorService mappingExecutor;
 
-    public Flowable<MappingResult> mapAndFilter(Item item) {
-        return Flowable.just(item)
+    public Flowable<MappingResult> mapAndFilter(Items items) {
+        return Flowable.just(items)
                 .subscribeOn(Schedulers.from(mappingExecutor))
-                .flatMap(itemToMap -> mapAndFilterInternal(item));
+                .flatMap(itemsToMap -> mapAndFilterInternal(items));
     }
 
     @PostConstruct
@@ -56,7 +56,7 @@ public class MappingChain {
         }
     }
 
-    private Flowable<MappingResult> mapAndFilterInternal(Item item) {
+    private Flowable<MappingResult> mapAndFilterInternal(Items items) {
         return Flowable.just(new MappingResult());
     }
 }
