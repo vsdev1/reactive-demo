@@ -31,10 +31,14 @@ public class MappingChain {
     private ExecutorService mappingExecutor;
     private final MetaDataService metaDataService;
 
-    public Flowable<MappingResult> mapAndFilter(Items items) {
-        return Flowable.just(items)
-                .subscribeOn(Schedulers.from(mappingExecutor))
-                .flatMap(itemsToMap -> mapAndFilterInternal(items));
+    public Flowable<MappedItem> map(Items items) {
+        final String productTitle = items.getProductTitle();
+
+        return metaDataService.getMetaData(productTitle)
+                .toFlowable()
+                .observeOn(Schedulers.from(mappingExecutor))
+                .zipWith(items.getItems(),
+                        (metaData, i) -> new MappedItem(productTitle, i.getMerchantName(), i.getPrice(), metaData));
     }
 
     @PostConstruct
@@ -55,12 +59,5 @@ public class MappingChain {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-    }
-
-    private Flowable<MappingResult> mapAndFilterInternal(Items items) {
-        // TODO: might be removed later, is just to try async http client
-        metaDataService.getMetaData(items.getProductTitle())
-                .subscribe(s -> log.info("got meta data: {}", s));
-        return Flowable.just(new MappingResult());
     }
 }

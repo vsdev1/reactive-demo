@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PublishingController {
 
-    @PostMapping("/exports")
+    @PostMapping(value = "/exports")
     @ResponseStatus(HttpStatus.CREATED)
     public void startExport(ExportRequest request) {
         log.info("exported: {}", request);

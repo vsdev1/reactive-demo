@@ -1,6 +1,6 @@
 package de.idealo.demo.reactivedemo.execution;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.springframework.stereotype.Component;
 
@@ -13,8 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PublishingChain {
 
-    public Flowable<PublishingResult> publishAndStore(List<MappingResult> mappingResults) {
-        return Flowable.just(mappingResults)
-                .map(results -> new PublishingResult());
+    private final PublishingService publishingService;
+
+    public Flowable<PublishingResult> publish(Collection<MappedItem> mappedItems) {
+        return publishingService.publish(mappedItems)
+                .toFlowable()
+                .map(results -> new PublishingResult(mappedItems.size()));
     }
 }

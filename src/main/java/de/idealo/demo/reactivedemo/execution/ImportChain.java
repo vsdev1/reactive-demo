@@ -15,23 +15,23 @@ import de.idealo.demo.reactivedemo.data.ItemParser;
 @RequiredArgsConstructor
 public class ImportChain {
 
-    private static final int PUBLISHING_BATCH_SIZE = 30;
+    private static final int PUBLISHING_BATCH_SIZE = 2;
 
     private final ItemParser itemParser;
     private final MappingChain mappingChain;
     private final PublishingChain publishingChain;
 
-    public Flowable<ImportResult> process() {
+    public Flowable<PublishingResult> process() {
         LongAdder itemCount = new LongAdder();
 
         return itemParser.parseItems()
+                .take(5) // TODO: just for testing (to have less data)
                 .doOnNext(item -> itemCount.increment())
-                .flatMap(mappingChain::mapAndFilter)
+                .flatMap(mappingChain::map)
                 .doOnNext(mappingResult -> log.info("mapping result: {} ", mappingResult))
                 .buffer(PUBLISHING_BATCH_SIZE)
-                .flatMap(publishingChain::publishAndStore)
-                .map(publishingResult -> new ImportResult())
+                .flatMap(publishingChain::publish)
                 .doOnComplete(() -> log.info("processed {} items", itemCount.longValue()))
-                .doAfterTerminate(() -> log.info("after terminate"));
+                .doOnError(e -> log.error("an error occurred", e));
     }
 }
