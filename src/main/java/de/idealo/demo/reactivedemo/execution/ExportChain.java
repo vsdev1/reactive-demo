@@ -11,13 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class PublishingChain {
+public class ExportChain {
 
-    private final PublishingService publishingService;
+    private final ExportService exportService;
 
-    public Flowable<PublishingResult> publish(Collection<MappedItem> mappedItems) {
-        return publishingService.publish(mappedItems)
+    public Flowable<ExportResult> export(Collection<MappedOffer> mappedOffers) {
+        return exportService.export(mappedOffers)
                 .toFlowable()
-                .map(results -> new PublishingResult(mappedItems.size()));
+                .map(results -> new ExportResult(mappedOffers.size()));
     }
 }

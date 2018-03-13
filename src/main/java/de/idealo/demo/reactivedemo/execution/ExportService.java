@@ -13,15 +13,15 @@ import org.springframework.stereotype.Service;
 import io.reactivex.Maybe;
 
 @Service
-public class PublishingService {
+public class ExportService {
 
     private final AsyncHttpClient asyncHttpClient = asyncHttpClient();
     private final RxHttpClient rxHttpClient = RxHttpClient.create(asyncHttpClient);
 
-    public Maybe<String> publish(Collection<MappedItem> mappedItems) {
+    public Maybe<String> export(Collection<MappedOffer> mappedOffers) {
         final BoundRequestBuilder boundRequestBuilder = asyncHttpClient
                 .preparePost("http://localhost:8080/exports")
-                .setBody("{\"itemsCount\": " + mappedItems.size() + "}");
+                .setBody("{\"itemsCount\": " + mappedOffers.size() + "}");
         return rxHttpClient.prepare(boundRequestBuilder.build())
                 .map(Response::getResponseBody);
     }

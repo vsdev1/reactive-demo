@@ -7,12 +7,12 @@ import lombok.Data;
 import lombok.Getter;
 
 @Data
-public class Items {
+public class Product {
     private final String productTitle;
     @Getter
-    private Collection<Item> items = new HashSet<>();
+    private Collection<Offer> offers = new HashSet<>();
 
-    public void addItem(Item item) {
-        items.add(item);
+    public void addOffer(Offer offer) {
+        offers.add(offer);
     }
 }

@@ -8,7 +8,7 @@ import io.reactivex.Flowable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import de.idealo.demo.reactivedemo.data.ItemParser;
+import de.idealo.demo.reactivedemo.data.ProductParser;
 
 @Component
 @Slf4j
@@ -17,21 +17,21 @@ public class ImportChain {
 
     private static final int PUBLISHING_BATCH_SIZE = 2;
 
-    private final ItemParser itemParser;
+    private final ProductParser productParser;
     private final MappingChain mappingChain;
-    private final PublishingChain publishingChain;
+    private final ExportChain exportChain;
 
-    public Flowable<PublishingResult> process() {
+    public Flowable<ExportResult> process() {
         LongAdder itemCount = new LongAdder();
 
-        return itemParser.parseItems()
+        return productParser.parseProduct()
                 .take(5) // TODO: just for testing (to have less data)
                 .doOnNext(item -> itemCount.increment())
                 .flatMap(mappingChain::map)
                 .doOnNext(mappingResult -> log.info("mapping result: {} ", mappingResult))
                 .buffer(PUBLISHING_BATCH_SIZE)
-                .flatMap(publishingChain::publish)
-                .doOnComplete(() -> log.info("processed {} items", itemCount.longValue()))
+                .flatMap(exportChain::export)
+                .doOnComplete(() -> log.info("processed {} offers", itemCount.longValue()))
                 .doOnError(e -> log.error("an error occurred", e));
     }
 }

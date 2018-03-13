@@ -11,11 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class PublishingController {
+public class ExportController {
 
     @PostMapping(value = "/exports")
     @ResponseStatus(HttpStatus.CREATED)
-    public void startExport(ExportRequest request) {
+    public void export(ExportRequest request) {
         log.info("exported: {}", request);
     }
 }

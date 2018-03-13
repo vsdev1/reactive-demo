@@ -1,5 +1,6 @@
 package de.idealo.demo.reactivedemo.data;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,23 +19,23 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class ItemParser {
+public class ProductParser {
 
     public static void main(String[] args) {
-        final ItemParser itemParser = new ItemParser();
+        final ProductParser productParser = new ProductParser();
 
-        itemParser.parseItems()
-                .subscribe(items -> log.info("parsed items: {}", items));
+        productParser.parseProduct()
+                .subscribe(product -> log.info("parsed product: {}", product));
     }
 
-    public Flowable<Items> parseItems() {
-        ClassLoader classLoader = ItemParser.class.getClassLoader();
+    public Flowable<Product> parseProduct() {
+        ClassLoader classLoader = ProductParser.class.getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream("feed.csv");
 
         try {
             Iterable<CSVRecord> records = CSVFormat.DEFAULT
                     .withFirstRecordAsHeader()
-                    .parse(new InputStreamReader(inputStream));
+                    .parse(new BufferedReader(new InputStreamReader(inputStream)));
 
             return Flowable.fromIterable(records)
                     .flatMap(this::mapFromCsvRow);
@@ -43,21 +44,21 @@ public class ItemParser {
         }
     }
 
-    private Flowable<Items> mapFromCsvRow(CSVRecord csvRow) {
+    private Flowable<Product> mapFromCsvRow(CSVRecord csvRow) {
         return Flowable.just(csvRow)
                 .map(row -> {
-                    final Items items = new Items(row.get("product title"));
-                    items.addItem(createItem(row, 1));
-                    items.addItem(createItem(row, 2));
-                    items.addItem(createItem(row, 3));
-                    log.info("parsed items: {}", items);
+                    final Product product = new Product(row.get("product title"));
+                    product.addOffer(createOffer(row, 1));
+                    product.addOffer(createOffer(row, 2));
+                    product.addOffer(createOffer(row, 3));
+                    log.info("parsed product: {}", product);
 
-                    return items;
+                    return product;
                 });
     }
 
-    private Item createItem(CSVRecord csvRow, int merchantIndex) throws ParseException {
-        return new Item(csvRow.get("item " + merchantIndex + " - Merchant name"),
+    private Offer createOffer(CSVRecord csvRow, int merchantIndex) throws ParseException {
+        return new Offer(csvRow.get("item " + merchantIndex + " - Merchant name"),
                 parsePrice(csvRow.get("item " + merchantIndex + " - price")));
     }
 

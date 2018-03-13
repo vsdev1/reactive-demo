@@ -3,6 +3,6 @@ package de.idealo.demo.reactivedemo.execution;
 import lombok.Data;
 
 @Data
-public class PublishingResult {
+public class ExportResult {
     private final int publishedItemsCount;
 }

@@ -16,7 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import de.idealo.demo.reactivedemo.data.Items;
+import de.idealo.demo.reactivedemo.data.Product;
 
 @Component
 @Slf4j
@@ -31,14 +31,14 @@ public class MappingChain {
     private ExecutorService mappingExecutor;
     private final MetaDataService metaDataService;
 
-    public Flowable<MappedItem> map(Items items) {
-        final String productTitle = items.getProductTitle();
+    public Flowable<MappedOffer> map(Product product) {
+        final String productTitle = product.getProductTitle();
 
         return metaDataService.getMetaData(productTitle)
                 .toFlowable()
                 .observeOn(Schedulers.from(mappingExecutor))
-                .zipWith(items.getItems(),
-                        (metaData, i) -> new MappedItem(productTitle, i.getMerchantName(), i.getPrice(), metaData));
+                .zipWith(product.getOffers(),
+                        (metaData, offer) -> new MappedOffer(productTitle, offer.getMerchantName(), offer.getPrice(), metaData));
     }
 
     @PostConstruct
