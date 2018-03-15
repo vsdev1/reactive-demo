@@ -2,9 +2,12 @@ package de.idealo.demo.reactivedemo.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -21,26 +24,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductParser {
 
-    public static void main(String[] args) {
-        final ProductParser productParser = new ProductParser();
-
-        productParser.parseProduct()
-                .subscribe(product -> log.info("parsed product: {}", product));
-    }
-
     public Flowable<Product> parseProduct() {
-        ClassLoader classLoader = ProductParser.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("feed.csv");
-
         try {
+            BufferedReader bufferedFeedReader = Files.newBufferedReader(getFeedPath(), StandardCharsets.UTF_8);
+
             Iterable<CSVRecord> records = CSVFormat.DEFAULT
                     .withFirstRecordAsHeader()
-                    .parse(new BufferedReader(new InputStreamReader(inputStream)));
+                    .parse(bufferedFeedReader);
 
-            return Flowable.fromIterable(records)
-                    .flatMap(this::mapFromCsvRow);
+            return Flowable.fromIterable(records).flatMap(this::mapFromCsvRow);
         } catch (IOException e) {
             throw new RuntimeException("error while parsing feed", e);
+        }
+    }
+
+    private Path getFeedPath() {
+        try {
+            return Paths.get(ClassLoader.getSystemResource("feed.csv").toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("error while getting feed path", e);
         }
     }
 

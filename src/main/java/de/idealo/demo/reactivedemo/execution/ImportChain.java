@@ -3,6 +3,7 @@ package de.idealo.demo.reactivedemo.execution;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import io.reactivex.Flowable;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import de.idealo.demo.reactivedemo.data.ProductParser;
 @RequiredArgsConstructor
 public class ImportChain {
 
-    private static final int PUBLISHING_BATCH_SIZE = 2;
+    private static final int EXPORT_BATCH_SIZE = 2;
 
     private final ProductParser productParser;
     private final MappingChain mappingChain;
@@ -24,14 +25,19 @@ public class ImportChain {
     public Flowable<ExportResult> process() {
         LongAdder itemCount = new LongAdder();
 
+        StopWatch stopWatch = new StopWatch("Offer import");
+        stopWatch.start();
         return productParser.parseProduct()
-                .take(5) // TODO: just for testing (to have less data)
+                .take(7) // TODO: just for testing (to have less data)
                 .doOnNext(item -> itemCount.increment())
                 .flatMap(mappingChain::map)
-                .doOnNext(mappingResult -> log.info("mapping result: {} ", mappingResult))
-                .buffer(PUBLISHING_BATCH_SIZE)
+                .buffer(EXPORT_BATCH_SIZE)
                 .flatMap(exportChain::export)
-                .doOnComplete(() -> log.info("processed {} offers", itemCount.longValue()))
+                .doOnComplete(() -> {
+                    log.info("processed {} offers", itemCount.longValue());
+                    stopWatch.stop();
+                    log.info("result: \n" + stopWatch.prettyPrint());
+                })
                 .doOnError(e -> log.error("an error occurred", e));
     }
 }

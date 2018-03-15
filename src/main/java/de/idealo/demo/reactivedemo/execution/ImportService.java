@@ -17,7 +17,8 @@ public class ImportService {
         importChain.process()
                 .subscribeOn(Schedulers.newThread())
                 .doOnCancel(() -> log.warn("cancelled"))
-                .doOnTerminate(() -> log.warn("terminated"))
-                .subscribe();
+                .doOnTerminate(() -> log.info("terminated"))
+                .subscribe(exportResult -> log.info("result: {}", exportResult),
+                        err -> log.error("error", err));
     }
 }
