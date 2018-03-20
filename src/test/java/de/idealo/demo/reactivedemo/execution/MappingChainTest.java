@@ -12,8 +12,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -33,9 +31,6 @@ public class MappingChainTest {
     private static final String MOCK_META_DATA = "mock meta data";
     private static final String MERCHANT_NAME_1 = "merchant name 1";
     private static final BigDecimal PRICE_1 = new BigDecimal(10.99D);
-
-    @Captor
-    private ArgumentCaptor<MappedOffer> mappedOfferArgumentCaptor;
 
     @Mock
     private MetaDataService metaDataServiceMock;
