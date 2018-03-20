@@ -1,19 +1,15 @@
 package de.idealo.demo.reactivedemo.execution;
 
-import static org.asynchttpclient.Dsl.asyncHttpClient;
-import static org.asynchttpclient.Dsl.config;
-
 import java.util.Collection;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.BoundRequestBuilder;
-import org.asynchttpclient.DefaultAsyncHttpClientConfig;
-import org.asynchttpclient.Response;
-import org.asynchttpclient.extras.rxjava2.RxHttpClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+
+import de.idealo.demo.reactivedemo.iternal.api.ExportRequest;
 
 @Service
 @Slf4j
@@ -25,18 +21,13 @@ public class ExportService {
     private static final String EXTERNAL_FAKE_POST_RESOURCE = "https://jsonplaceholder.typicode.com/posts/";
     private static final String INTERNAL_FAKE_POST_RESOURCE = "http://localhost:8080/exports";
 
-    private final DefaultAsyncHttpClientConfig.Builder config = config().setIoThreadsCount(THREAD_COUNT).setThreadPoolName(THREAD_POOL_NAME);
-    private final AsyncHttpClient asyncHttpClient = asyncHttpClient(config);
-    private final RxHttpClient rxHttpClient = RxHttpClient.create(asyncHttpClient);
+    private final WebClient webClient = WebClient.create(createFakeResourceRequest(true));
 
-    public Maybe<String> export(Collection<MappedOffer> mappedOffers) {
-        final BoundRequestBuilder boundRequestBuilder = asyncHttpClient
-                .preparePost(createFakeResourceRequest(true))
-                .setBody("{\"itemsCount\": " + mappedOffers.size() + "}");
-
-        return rxHttpClient.prepare(boundRequestBuilder.build())
-                .doOnSuccess(response -> log.info("exported {} offers", mappedOffers.size()))
-                .map(Response::getResponseBody);
+    public Mono<String> export(Collection<MappedOffer> mappedOffers) {
+        return webClient.post()
+                .body(BodyInserters.fromObject(new ExportRequest(mappedOffers.size())))
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
     private String createFakeResourceRequest(boolean external) {

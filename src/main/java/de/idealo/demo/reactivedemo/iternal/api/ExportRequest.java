@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class ExportRequest {
-    private int itemsCount;
+    private final int itemsCount;
 }

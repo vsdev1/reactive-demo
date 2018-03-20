@@ -17,14 +17,14 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Component;
 
-import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
 @Component
 @Slf4j
 public class ProductParser {
 
-    public Flowable<Product> parseProduct() {
+    public Flux<Product> parseProduct() {
         try {
             BufferedReader bufferedFeedReader = Files.newBufferedReader(getFeedPath(), StandardCharsets.UTF_8);
 
@@ -32,7 +32,7 @@ public class ProductParser {
                     .withFirstRecordAsHeader()
                     .parse(bufferedFeedReader);
 
-            return Flowable.fromIterable(records).flatMap(this::mapFromCsvRow);
+            return Flux.fromIterable(records).flatMap(this::mapFromCsvRow);
         } catch (IOException e) {
             throw new RuntimeException("error while parsing feed", e);
         }
@@ -46,8 +46,8 @@ public class ProductParser {
         }
     }
 
-    private Flowable<Product> mapFromCsvRow(CSVRecord csvRow) {
-        return Flowable.just(csvRow)
+    private Flux<Product> mapFromCsvRow(CSVRecord csvRow) {
+        return Flux.just(csvRow)
                 .map(row -> {
                     final Product product = new Product(row.get("product title"));
                     product.addOffer(createOffer(row, 1));
@@ -59,9 +59,13 @@ public class ProductParser {
                 });
     }
 
-    private Offer createOffer(CSVRecord csvRow, int merchantIndex) throws ParseException {
-        return new Offer(csvRow.get("item " + merchantIndex + " - Merchant name"),
-                parsePrice(csvRow.get("item " + merchantIndex + " - price")));
+    private Offer createOffer(CSVRecord csvRow, int merchantIndex) {
+        try {
+            return new Offer(csvRow.get("item " + merchantIndex + " - Merchant name"),
+                    parsePrice(csvRow.get("item " + merchantIndex + " - price")));
+        } catch (ParseException e) {
+            throw new RuntimeException("error while parsing csv row: " + csvRow, e);
+        }
     }
 
     private BigDecimal parsePrice(String price) throws ParseException {

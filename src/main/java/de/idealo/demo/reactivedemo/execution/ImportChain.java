@@ -5,9 +5,9 @@ import java.util.concurrent.atomic.LongAdder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
-import io.reactivex.Flowable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
 import de.idealo.demo.reactivedemo.data.ProductParser;
 
@@ -22,7 +22,7 @@ public class ImportChain {
     private final MappingChain mappingChain;
     private final ExportChain exportChain;
 
-    public Flowable<ExportResult> process() {
+    public Flux<ExportResult> process() {
         LongAdder itemCount = new LongAdder();
 
         StopWatch stopWatch = new StopWatch("Offer import");
