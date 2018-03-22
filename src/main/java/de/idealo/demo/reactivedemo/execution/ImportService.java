@@ -15,7 +15,7 @@ public class ImportService {
 
     public void startJob() {
         importChain.process()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.single())
                 .doOnCancel(() -> log.warn("cancelled"))
                 .doOnTerminate(() -> log.info("terminated"))
                 .subscribe(exportResult -> log.info("result: {}", exportResult),
