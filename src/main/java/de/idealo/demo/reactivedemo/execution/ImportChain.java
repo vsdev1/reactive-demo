@@ -34,7 +34,7 @@ public class ImportChain {
                 .buffer(EXPORT_BATCH_SIZE)
                 .flatMap(exportChain::export)
                 .doOnComplete(() -> {
-                    log.info("processed {} offers", itemCount.longValue());
+                    log.info("processed {} products", itemCount.longValue());
                     stopWatch.stop();
                     log.info("result: \n" + stopWatch.prettyPrint());
                 })
