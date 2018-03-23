@@ -20,6 +20,7 @@ public class MappingChain {
         final String productTitle = product.getProductTitle();
 
         return metaDataService.getMetaData(productTitle)
+                .onErrorReturnItem("fallback meta data")
                 .toFlowable()
                 .observeOn(Schedulers.computation())
                 .zipWith(product.getOffers(),
