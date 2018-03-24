@@ -10,23 +10,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+import de.idealo.demo.reactivedemo.config.ServicesProperties;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MetaDataService {
 
-    private static final int THREAD_COUNT = 1;
-
-    private static final String THREAD_POOL_NAME = "get-metaData";
     private static final String EXTERNAL_FAKE_GET_RESOURCE = "https://jsonplaceholder.typicode.com/posts/1";
     private static final String INTERNAL_FAKE_GET_RESOURCE = "http://localhost:8080/meta-data";
+
+    private final ServicesProperties servicesProperties;
 
     private WebClient webClient;
 
     @PostConstruct
     public void init() {
         webClient = WebClient.builder()
-                .baseUrl(createFakeResourceRequest(true))
+                .baseUrl(createFakeResourceRequest())
                 .filter(logRequest())
                 .build();
     }
@@ -37,8 +38,9 @@ public class MetaDataService {
                 .retrieve().bodyToMono(String.class);
     }
 
-    private String createFakeResourceRequest(boolean external) {
-        return external ? EXTERNAL_FAKE_GET_RESOURCE : INTERNAL_FAKE_GET_RESOURCE;
+    private String createFakeResourceRequest() {
+        return servicesProperties.getMetaDataService() != null && servicesProperties.getMetaDataService().getExternalAPI()
+                ? EXTERNAL_FAKE_GET_RESOURCE : INTERNAL_FAKE_GET_RESOURCE;
     }
 
     private ExchangeFilterFunction logRequest() {

@@ -21,8 +21,10 @@ public class MappingChain {
         final String productTitle = product.getProductTitle();
 
         return Flux.just(true)
-                .subscribeOn(Schedulers.single())
+                .subscribeOn(Schedulers.elastic())
                 .switchMap(dummy -> Flux.from(metaDataService.getMetaData(productTitle)))
+                .retry(3)
+                .onErrorReturn("fallback meta data")
                 .publishOn(Schedulers.parallel())
                 .zipWith(Flux.fromIterable(product.getOffers()))
                 .map(objects -> {
