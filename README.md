@@ -12,7 +12,7 @@ This workflow is triggered by the REST request `POST http://localhost:8080/impor
 
 The external REST services can be either external or internal ones (configured in `application.properties`). The internal services has a delay and can therefore be useful to test how the async http client behaves with different thread pool sizes. 
 
-###Further reading:
+### Further reading:
 * [rxjava documentation](https://github.com/ReactiveX/RxJava/wiki)
 * [Spring reactor documentation](http://projectreactor.io/docs/core/release/reference/)
 * [Comparing Java 8, RxJava, Reactor](http://alexsderkach.io/comparing-java-8-rxjava-reactor/)
