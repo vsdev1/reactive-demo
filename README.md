@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/vsdev1/reactive-demo.svg?branch=master)](https://travis-ci.org/vsdev1/reactive-demo) 
 
-This project demonstrates the usage of [rxjava 2](https://github.com/ReactiveX/RxJava) and [Spring reactor](https://projectreactor.io/). It 
+This project demonstrates the usage of [rxjava 2](https://github.com/ReactiveX/RxJava) (in master branch) and [Spring reactor](https://projectreactor.io/) (in spring-reactor branch). It 
 1. reads data from a CSV file, 
 2. converts those data,
 3. enriches them with meta data from an external REST service (via an asynchronous non-blocking http client),
