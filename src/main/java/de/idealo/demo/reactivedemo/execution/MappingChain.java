@@ -22,12 +22,10 @@ public class MappingChain {
         return metaDataService.getMetaData(productTitle)
                 .retry(3)
                 .onErrorReturnItem("fallback meta data")
-                .toFlowable()
                 .observeOn(Schedulers.computation())
-                .zipWith(product.getOffers(),
-                        (metaData, offer) -> {
-                            log.info("create mapped offer with meta data");
-                            return new MappedOffer(productTitle, offer.getMerchantName(), offer.getPrice(), metaData);
-                        });
+                .flatMapPublisher(metaData -> Flowable.fromIterable(product.getOffers()).map(offer -> {
+                    log.info("create mapped offer with meta data");
+                    return new MappedOffer(productTitle, offer.getMerchantName(), offer.getPrice(), metaData);
+                }));
     }
 }
