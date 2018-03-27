@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
-import de.idealo.demo.reactivedemo.data.Offer;
 import de.idealo.demo.reactivedemo.data.Product;
 
 @Component
@@ -26,13 +25,10 @@ public class MappingChain {
                 .retry(3)
                 .onErrorReturn("fallback meta data")
                 .publishOn(Schedulers.parallel())
-                .zipWith(Flux.fromIterable(product.getOffers()))
-                .map(objects -> {
+                .flatMap(metaData -> Flux.fromIterable(product.getOffers()).map(offer -> {
                     log.info("create mapped offer with meta data");
-                    final String metaData = objects.getT1();
-                    final Offer offer = objects.getT2();
-
                     return new MappedOffer(productTitle, offer.getMerchantName(), offer.getPrice(), metaData);
-                });
+                }));
+
     }
 }

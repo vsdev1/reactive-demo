@@ -1,7 +1,5 @@
 package de.idealo.demo.reactivedemo.execution;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +26,8 @@ public class MappingChainTest {
     private static final String MOCK_META_DATA = "mock meta data";
     private static final String MERCHANT_NAME_1 = "merchant name 1";
     private static final BigDecimal PRICE_1 = new BigDecimal(10.99D);
+    private static final String MERCHANT_NAME_2 = "merchant name 2";
+    private static final BigDecimal PRICE_2 = new BigDecimal(123.23D);
 
     @Mock
     private MetaDataService metaDataServiceMock;
@@ -43,17 +43,13 @@ public class MappingChainTest {
 
         final Product product = new Product(PRODUCT_TITLE);
         product.addOffer(new Offer(MERCHANT_NAME_1, PRICE_1));
+        product.addOffer(new Offer(MERCHANT_NAME_2, PRICE_2));
 
         // when and then
         StepVerifier.withVirtualTime(() -> mappingChain.map(product))
                 .expectSubscription()
                 .thenAwait(Duration.ofSeconds(2))
-                .assertNext(mappedOffer -> {
-                    assertThat(mappedOffer.getProductTitle(), is(PRODUCT_TITLE));
-                    assertThat(mappedOffer.getMerchantName(), is(MERCHANT_NAME_1));
-                    assertThat(mappedOffer.getPrice(), is(PRICE_1));
-                    assertThat(mappedOffer.getMetaData(), is(MOCK_META_DATA));
-                })
+                .expectNextCount(2)
                 .verifyComplete();
 
         verify(metaDataServiceMock).getMetaData(PRODUCT_TITLE);
