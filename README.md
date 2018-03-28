@@ -23,5 +23,6 @@ The external REST services can be either external or internal ones (configured i
 * [Schedulers](http://www.baeldung.com/rxjava-schedulers)
 * [Backpressure](http://www.baeldung.com/rxjava-backpressure)
 * [Error handling](http://www.baeldung.com/rxjava-error-handling)
+* [Idiomatic Concurrency — flatMap() vs. parallel()](https://dzone.com/articles/rxjava-idiomatic-concurrency-flatmap-vs-parallel)
 * [Async http client for rxjava 2](https://github.com/AsyncHttpClient/async-http-client/tree/master/extras/rxjava2)
 * [Async http client for Spring reactor](https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux-client)
