@@ -19,7 +19,7 @@ public class ImportController {
 
     @PostMapping("/imports")
     @ResponseStatus(HttpStatus.CREATED)
-    public void startImport(StartImportRequest request) {
+    public void startImport() {
         importService.startJob();
     }
 }
